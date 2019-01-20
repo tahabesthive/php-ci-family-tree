@@ -1,0 +1,39 @@
+###############################################################################
+#                          Generated on phpdocker.io                          #
+###############################################################################
+version: "3.1"
+services:
+
+    mysql:
+      image: mysql:5.7
+      container_name: pipedrivetest-mysql
+      working_dir: /pipedrive
+      volumes:
+        - .:/pipedrive
+      command: --init-file /pipedrive/phpdocker/data/init.sql --sql_mode=''
+      environment:
+        - MYSQL_ROOT_PASSWORD=netdoor
+        - MYSQL_DATABASE=pipedrive
+        - MYSQL_USER=pipedrive
+        - MYSQL_PASSWORD=netdoor
+      ports:
+        - "3306:3306"
+
+    webserver:
+      image: nginx:alpine
+      container_name: pipedrivetest-webserver
+      working_dir: /pipedrive
+      volumes:
+          - .:/pipedrive
+          - ./phpdocker/nginx/nginx.conf:/etc/nginx/conf.d/default.conf
+      ports:
+       - "80:80"
+
+    php-fpm:
+      build: phpdocker/php-fpm
+      container_name: pipedrivetest-php-fpm
+      working_dir: /pipedrive
+      volumes:
+        - .:/pipedrive
+        - ./phpdocker/php-fpm/php-ini-overrides.ini:/etc/php/7.3/fpm/conf.d/99-overrides.ini
+
